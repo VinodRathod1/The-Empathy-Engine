@@ -73,4 +73,11 @@ Emotionally aware speech synthesis using AI
 
 ## 📸 Screenshots
 
-[Add screenshots here]
+### Angry Output
+![Angry Result](angry.png)
+
+### Joy Output
+![Joy Result](joy.png)
+
+### Sad Output
+![Sad Result](sad.png)
