@@ -74,6 +74,3 @@ Emotionally aware speech synthesis using AI
 ## 📸 Screenshots
 
 [Add screenshots here]
-
-## 📄 License
-MIT
