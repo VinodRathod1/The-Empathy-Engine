@@ -1,0 +1,9 @@
+Flask>=3.0.0
+transformers>=4.35.2
+torch>=2.1.2
+gTTS>=2.4.0
+pydub>=0.25.1
+scipy
+numpy
+imageio-ffmpeg
+static-ffmpeg

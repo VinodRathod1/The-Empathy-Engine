@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Empathy Engine 🎙</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-start: #0f172a;
+            --bg-end: #312e81;
+            --container-bg: rgba(30, 41, 59, 0.75);
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--container-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        textarea {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.05rem;
+            resize: vertical;
+            min-height: 130px;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+        }
+
+        textarea::placeholder {
+            color: #64748b;
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), #d946ef);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loader {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .result-panel {
+            margin-top: 30px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            display: none;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes slideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .emotion-card {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .emoji-container {
+            font-size: 3.5rem;
+            margin-right: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            height: 80px;
+            width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .emotion-details {
+            flex: 1;
+        }
+
+        .emotion-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: capitalize;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .confidence-wrapper {
+            width: 100%;
+        }
+        
+        .confidence-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4ade80, #3b82f6);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .metrics-bar {
+            margin-top: 20px;
+            padding: 14px 18px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .metric-value {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .pitch-highlight {
+            color: #f472b6;
+            font-weight: 700;
+        }
+
+        .audio-wrapper {
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            margin-top: 24px;
+        }
+
+        audio {
+            width: 100%;
+            height: 45px;
+            outline: none;
+        }
+
+        audio::-webkit-media-controls-panel {
+            background-color: #f1f5f9;
+        }
+
+        .error-message {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 24px; }
+            h1 { font-size: 2rem; }
+            .emoji-container { font-size: 2.5rem; width: 60px; height: 60px; margin-right: 15px;}
+            .emotion-name { font-size: 1.3rem; }
+            button { font-size: 1.05rem; padding: 15px;}
+            .metrics-bar { flex-direction: column; gap: 10px; align-items: flex-start; }
+            .metric-item { flex-direction: row; gap: 10px; width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>The Empathy Engine 🎙</h1>
+        <p class="subtitle">Emotionally aware speech synthesis</p>
+
+        <div class="input-group">
+            <textarea id="text-input" placeholder="Type something emotional here..."></textarea>
+        </div>
+
+        <button id="generate-btn">
+            <span id="btn-text">Generate Speech</span>
+            <div id="btn-loader" class="loader"></div>
+        </button>
+
+        <div id="error-msg" class="error-message"></div>
+
+        <div id="result-panel" class="result-panel">
+            <div class="emotion-card">
+                <div class="emoji-container" id="emotion-emoji">😐</div>
+                <div class="emotion-details">
+                    <div class="emotion-name" id="emotion-name">Neutral</div>
+                    <div class="confidence-wrapper">
+                        <div class="confidence-header">
+                            <span>Confidence Score</span>
+                            <span id="confidence-text">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="confidence-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metrics-bar">
+                <div class="metric-item">
+                    <span style="font-size:0.8rem; text-transform:uppercase;">Speed</span>
+                    <span class="metric-value" id="metric-speed">1.0x</span>
+                </div>
+                <div class="metric-item">
+                    <span style="font-size:0.8rem; text-transform:uppercase;">Volume</span>
+                    <span class="metric-value" id="metric-volume">0dB</span>
+                </div>
+                <div class="metric-item">
+                    <span style="font-size:0.8rem; text-transform:uppercase; color:#f472b6;">Pitch Shift</span>
+                    <span class="pitch-highlight" id="metric-pitch">0 semitones</span>
+                </div>
+            </div>
+
+            <div class="audio-wrapper">
+                <audio id="audio-player" controls>
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const btn = document.getElementById('generate-btn');
+        const btnText = document.getElementById('btn-text');
+        const btnLoader = document.getElementById('btn-loader');
+        const textInput = document.getElementById('text-input');
+        const resultPanel = document.getElementById('result-panel');
+        const errorMsg = document.getElementById('error-msg');
+        const emotionName = document.getElementById('emotion-name');
+        const emotionEmoji = document.getElementById('emotion-emoji');
+        const confidenceText = document.getElementById('confidence-text');
+        const confidenceBar = document.getElementById('confidence-bar');
+        const audioPlayer = document.getElementById('audio-player');
+        const metricSpeed = document.getElementById('metric-speed');
+        const metricVolume = document.getElementById('metric-volume');
+        const metricPitch = document.getElementById('metric-pitch');
+
+        const colorMap = {
+            joy: 'linear-gradient(to right, #4ade80, #22c55e)',
+            anger: 'linear-gradient(to right, #f87171, #ef4444)',
+            sadness: 'linear-gradient(to right, #7dd3fc, #38bdf8)',
+            fear: 'linear-gradient(to right, #c084fc, #a855f7)',
+            surprise: 'linear-gradient(to right, #fde047, #eab308)',
+            disgust: 'linear-gradient(to right, #d1d5db, #9ca3af)',
+            neutral: 'linear-gradient(to right, #cbd5e1, #94a3b8)'
+        };
+
+        btn.addEventListener('click', async () => {
+            const text = textInput.value.trim();
+            if (!text) {
+                showError("Please enter some text first.");
+                return;
+            }
+
+            // Reset UI
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'block';
+            errorMsg.style.display = 'none';
+            
+            // Re-trigger animation
+            resultPanel.style.display = 'none';
+            resultPanel.style.animation = 'none';
+            resultPanel.offsetHeight; /* trigger reflow */
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Failed to generate audio");
+                }
+
+                const em = data.emotion.toLowerCase();
+                const confPercent = Math.round(data.confidence * 100);
+
+                // Update UI Emote and Bar data
+                emotionName.textContent = data.emotion;
+                emotionEmoji.textContent = data.emoji;
+                confidenceText.textContent = confPercent + '%';
+                
+                // Update specific styles
+                emotionName.style.color = (em === 'joy') ? '#4ade80' : 
+                                          (em === 'anger') ? '#f87171' : 
+                                          (em === 'sadness') ? '#7dd3fc' : 
+                                          (em === 'fear') ? '#c084fc' : 
+                                          (em === 'surprise') ? '#fde047' : 
+                                          (em === 'disgust') ? '#d1d5db' : '#cbd5e1';
+
+                confidenceBar.style.background = colorMap[em] || colorMap['neutral'];
+                
+                // Update Detailed Metrics
+                metricSpeed.textContent = data.speed.toFixed(2) + 'x';
+                metricVolume.textContent = (data.volume > 0 ? '+' : '') + data.volume.toFixed(1) + 'dB';
+                
+                const pVal = data.pitch;
+                const arrow = pVal > 0 ? ' ↑' : (pVal < 0 ? ' ↓' : '');
+                metricPitch.textContent = (pVal > 0 ? '+' : '') + pVal + ' st' + arrow;
+                
+                // Set audio
+                audioPlayer.src = data.audio_url;
+
+                // Show panel and animate progress bar
+                resultPanel.style.display = 'block';
+                resultPanel.style.animation = 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                
+                confidenceBar.style.width = '0%';
+                setTimeout(() => {
+                    confidenceBar.style.width = confPercent + '%';
+                }, 100);
+                
+                audioPlayer.play().catch(e => console.log("Auto-play prevented by browser interaction rules"));
+
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                btn.disabled = false;
+                btnText.style.display = 'block';
+                btnLoader.style.display = 'none';
+            }
+        });
+
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
