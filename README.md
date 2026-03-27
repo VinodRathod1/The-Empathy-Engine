@@ -1,6 +1,6 @@
 # The Empathy Engine 🎙
 
-Emotionally aware speech synthesis using AI
+**The Empathy Engine** is an emotionally aware speech synthesis web application. It uses a customized Hugging Face transformer model to analyze text input, dynamically classify the sentiment into one of 7 distinct human emotions (Joy, Anger, Sadness, Fear, Disgust, Surprise, or Neutral), and automatically adjust audio playback characteristics like pitch, delivery speed, volume, and sentence-level pausing in real time. The ultimate goal is to bridge the gap between AI and human dialogue by creating synthetic voices that truly *feel* human.
 
 ## ✨ Features
 
