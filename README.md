@@ -81,3 +81,6 @@ Emotionally aware speech synthesis using AI
 
 ### Sad Output
 ![Sad Result](sad.png)
+
+## 📄 License
+MIT
